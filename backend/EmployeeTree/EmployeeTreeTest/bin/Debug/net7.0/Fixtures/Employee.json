@@ -1,0 +1,52 @@
+[
+  {
+    "Id": 1,
+    "Name": "raelynn",
+    "ManagerId": null
+  },
+  {
+    "Id": 2,
+    "Name": "darin",
+    "ManagerId": 1
+  },
+  {
+    "Id": 3,
+    "Name": "kacie",
+    "ManagerId": 1
+  },
+  {
+    "Id": 4,
+    "Name": "jordana",
+    "ManagerId": 2
+  },
+  {
+    "Id": 5,
+    "Name": "everett",
+    "ManagerId": 2
+  },
+  {
+    "Id": 6,
+    "Name": "bertha",
+    "ManagerId": 2
+  },
+  {
+    "Id": 7,
+    "Name": "peg",
+    "ManagerId": 3
+  },
+  {
+    "Id": 8,
+    "Name": "hugh",
+    "ManagerId": 3
+  },
+  {
+    "Id": 9,
+    "Name": "eveleen",
+    "ManagerId": 3
+  },
+  {
+    "Id": 10,
+    "Name": "evelina",
+    "ManagerId": 9
+  }
+]

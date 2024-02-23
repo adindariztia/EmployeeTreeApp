@@ -1,0 +1,48 @@
+body, html {
+    height: 100%;
+}
+
+body {
+    background-image: url("./assets/img/burem.jpg");
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#searchResults {
+    display: none;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    position: absolute;
+    z-index: 1000;
+    width: 300px;
+}
+
+.resultItem {
+    padding: 10px;
+    cursor: pointer;
+}
+  
+.resultItem:hover {
+    background-color: #f0f0f0;
+}
+
+.form-floating {
+    padding: 5px;
+}
+
+.card {
+    margin: 0 auto;
+    float: none;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+#employee-managers {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+

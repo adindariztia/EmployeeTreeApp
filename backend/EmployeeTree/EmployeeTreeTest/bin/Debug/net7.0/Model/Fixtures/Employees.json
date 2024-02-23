@@ -1,0 +1,106 @@
+[
+  {
+    "Id": 1,
+    "Name": "raelynn",
+    "ManagerId": null,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": null,
+    "EmployeeLevel": 1
+  },
+  {
+    "Id": 2,
+    "Name": "darin",
+    "ManagerId": 1,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": null,
+    "EmployeeLevel": 2
+  },
+  {
+    "Id": 3,
+    "Name": "kacie",
+    "ManagerId": 1,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": null,
+    "EmployeeLevel": 2
+  },
+  {
+    "Id": 4,
+    "Name": "jordana",
+    "ManagerId": 2,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": null,
+    "EmployeeLevel": 3
+  },
+  {
+    "Id": 5,
+    "Name": "everett",
+    "ManagerId": 2,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": null,
+    "EmployeeLevel": 3
+  },
+  {
+    "Id": 6,
+    "Name": "bertha",
+    "ManagerId": 2,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": null,
+    "EmployeeLevel": 3
+  },
+  {
+    "Id": 7,
+    "Name": "peg",
+    "ManagerId": 3,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": [2,1],
+    "EmployeeLevel": 3
+  },
+  {
+    "Id": 8,
+    "Name": "hugh",
+    "ManagerId": 3,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": [2],
+    "EmployeeLevel": 3
+  },
+  {
+    "Id": 9,
+    "Name": "eveleen",
+    "ManagerId": 3,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": [2],
+    "EmployeeLevel": 3
+  },
+  {
+    "Id": 10,
+    "Name": "evelina",
+    "ManagerId": 9,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": [7,8],
+    "EmployeeLevel": 4
+  },
+  {
+    "Id":  11,
+    "Name": "udin",
+    "ManagerId": 1,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": null,
+    "EmployeeLevel": 5
+  },
+  {
+    "Id":  11,
+    "Name": "udin",
+    "ManagerId": 12,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": null,
+    "EmployeeLevel": 5
+  },
+  {
+    "Id": 12,
+    "Name": "sasa",
+    "ManagerId": null,
+    "DirectReportsTo": null,
+    "IndirectReportsTo": null,
+    "EmployeeLevel": 5
+  }
+]
