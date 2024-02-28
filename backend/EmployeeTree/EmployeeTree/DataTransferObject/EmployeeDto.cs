@@ -9,7 +9,7 @@ public class EmployeeDto
     public List<Dictionary<int, string>> Managers { get; set; }
     public bool IsManagerAvailable { get; set; }
     public string? Message { get; set; }
-    public List<int>? DirectReportsTo { get; set; }
-    public List<int>? IndirectReportsTo { get; set; }
+    public List<string>? DirectReports { get; set; }
+    public List<string>? IndirectReports { get; set; }
     public int EmployeeLevel { get; set; }
 }

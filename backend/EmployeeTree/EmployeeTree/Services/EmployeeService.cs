@@ -14,41 +14,48 @@ public class EmployeeService : IEmployeeService
         OrganizationTree(LoadEmployees(dataJsonPath));
     }
     
-    public EmployeeDto GetEmployeeTree(int employeeId)
+    public EmployeeDto GetEmployeeTree(string employeeName)
     {
         var managers = new List<Dictionary<int, string>>();
         var message = string.Empty;
-        var currentNode = new NodeTree();
-        var multipleManagers = new List<string>();
-        var employeeReportsValidity = new EmployeeReports();
+        var indirectReports = new List<string>();
+        var directReports = new List<string>();
+
+        var currentNode = SearchEmployee(employeeName);
         
-        if (!_nodeMap.ContainsKey(employeeId))
+        if (currentNode == null)
         {
-            return new EmployeeDto { Message = "Employee not found", Managers = managers};
+            return new EmployeeDto { Message = "Employee not found"};
         }
+
+        var employeeId = (currentNode?.Employee.Id) ?? default(int);
         
-        var multipleManagersId = _employees.Where(emp => emp.Id == employeeId).Select(emp => emp.ManagerId).ToList();
-        var multipleManagerNames = _employees.Where(emp => multipleManagersId.Contains(emp.Id)).Select(emp => emp.Name)
-            .ToList();
-        
-        //check if employee has multiple managers, if dont then proceed to get valid managers
-        if (multipleManagerNames.Count > 1)
+        // evaluate if employee has multiple managers
+        var (isManagerValid, multipleManagerNames) = IsMultipleManagerDetected(employeeId);
+        if (!isManagerValid)
         {
             message = $"Unable to process, employee has multiple managers, found: {string.Join(", ", multipleManagerNames)}";
+            return new EmployeeDto
+            {
+                Id = employeeId,
+                Name = employeeName,
+                IsManagerAvailable = true,
+                Message = message
+            };
         }
         
-        // evaluate if employee has valid reports to data
-        currentNode = _nodeMap[employeeId];
-        employeeReportsValidity = ValidateEmployeeReportsTo(currentNode.Employee);
-        if (!employeeReportsValidity.IsValid)
-        {
-            message += "\n" + employeeReportsValidity.Message;
-        } else
-        {
-            GetManagers(currentNode, managers, employeeId, multipleManagers);
-        }
+        // traverse upwardly to search for employee's managers
+        GetManagers(currentNode, managers, employeeId); 
+        
+        //traverse downwardly to search for employee's direct and indirect reports
+        (directReports, indirectReports) = GetReports(currentNode, employeeId, directReports, indirectReports);
         
         var isManagerAvailable = managers.Count > 0;
+        
+        if (!isManagerAvailable && directReports.Count == 0)
+        {
+            message = "Employee does not have hierarchy";
+        }
         
         var employeeDto = new EmployeeDto
         {
@@ -57,12 +64,30 @@ public class EmployeeService : IEmployeeService
             Managers = managers,
             IsManagerAvailable = isManagerAvailable,
             EmployeeLevel = currentNode?.Employee?.EmployeeLevel ?? -1,
-            DirectReportsTo = currentNode?.Employee?.DirectReportsTo,
-            IndirectReportsTo = currentNode?.Employee?.IndirectReportsTo,
+            DirectReports = directReports,
+            IndirectReports = indirectReports,
             Message = string.IsNullOrEmpty(message) ? $"Request sucessfull" : message
         };
         
         return employeeDto;
+    }
+
+    private NodeTree? SearchEmployee(string employeeName)
+    {
+        var employee = _nodeMap.Where(emp => emp.Value.Employee.Name.Equals(employeeName))
+            .Select(emp => emp.Value)
+            .FirstOrDefault();
+        return employee;
+    }
+
+    private (bool, List<string>) IsMultipleManagerDetected(int employeeId)
+    {
+        var multipleManagersId = _employees.Where(emp => emp.Id == employeeId).Select(emp => emp.ManagerId).ToList();
+        var multipleManagerNames = _employees.Where(emp => multipleManagersId.Contains(emp.Id)).Select(emp => emp.Name)
+            .ToList();
+        
+        // employee with more than 1 manager is not permitted
+        return (multipleManagerNames.Count is 0 or 1, multipleManagerNames);
     }
     
     private void OrganizationTree(List<Employee> employees)
@@ -83,12 +108,12 @@ public class EmployeeService : IEmployeeService
         }
     }
 
-    private void GetManagers(NodeTree node, List<Dictionary<int, string>> result, int employeeId, List<string> multipleManagers)
+    private void GetManagers(NodeTree node, List<Dictionary<int, string>> result, int employeeId)
     {
         if (node.Employee.ManagerId != null)
         {
             var managerNode = _nodeMap[node.Employee.ManagerId.Value];
-            GetManagers(managerNode, result, employeeId, multipleManagers);
+            GetManagers(managerNode, result, employeeId);
         }
 
         if (node.Employee.Id == employeeId) return;
@@ -99,21 +124,22 @@ public class EmployeeService : IEmployeeService
         };
         result.Add(employeeNode);
     }
-    
-    public EmployeeReports ValidateEmployeeReportsTo(Employee employee)
-    {
-        var message = string.Empty;
-        var isValid = true;
-        var isEmptyDirectReports = (employee.DirectReportsTo == null || employee.DirectReportsTo?.Count == 0);
-        
-        // Only EmployeeLevel = 1 are allowed to have no manager and direct reports
-        if (!employee.ManagerId.HasValue && isEmptyDirectReports && employee.EmployeeLevel != 1)
-            (isValid, message) = (false, "Employee needs to either have manager/direct report");
 
-        if (employee.ManagerId.HasValue && !isEmptyDirectReports)
-            (isValid, message) = (false, "Employee having managers cannot have direct reports");
+    private (List<string>,List<string>) GetReports(NodeTree node, int employeeId, List<string> directReports, List<string> indirectReports)
+    {
+        if (node.Employee.Id == employeeId)
+        {
+            directReports.AddRange(node.Children.Select(c => c.Employee.Name).ToList());
+        }
+
+        foreach (var child in node.Children)
+        {
+            var childNode = _nodeMap[child.Employee.Id];
+            indirectReports.AddRange(childNode.Children.Select(c => c.Employee.Name).ToList());
+            GetReports(childNode, employeeId, directReports, indirectReports);
+        }
         
-        return new EmployeeReports { IsValid = isValid, Message = message };
+        return (directReports, indirectReports);
     }
     
     private List<Employee> LoadEmployees(string targetJson)
@@ -132,14 +158,5 @@ public class EmployeeService : IEmployeeService
     public List<EmployeeDto> GetEmployees()
     {
         return _employees.Select(employee => new EmployeeDto { Id = employee.Id, Name = employee.Name }).ToList();
-    }
-
-    public List<EmployeeDto> SearchEmployee(string employeeName)
-    {
-        var res = _employees
-            .Select(employee => new EmployeeDto { Id = employee.Id, Name = employee.Name })
-            .Where(employee => employee.Name.Contains(employeeName))
-            .ToList();
-        return res;
     }
 }

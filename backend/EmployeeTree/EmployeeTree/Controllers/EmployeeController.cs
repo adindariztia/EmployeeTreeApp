@@ -21,16 +21,10 @@ public class EmployeeController : Controller
         return Ok(result);
     }
     
-    [HttpGet, Route("{employeeId}")]
-    public IActionResult GetManagers(int employeeId)
+    [HttpGet, Route("{employeeName}")]
+    public IActionResult GetManagers(string employeeName)
     {
-        var result = _service.GetEmployeeTree(employeeId);
-        return Ok(result);
-    }
-    [HttpGet, Route("employees/search")]
-    public IActionResult SearchEmployee([FromQuery] string employeeName)
-    {
-        var result = _service.SearchEmployee(employeeName);
+        var result = _service.GetEmployeeTree(employeeName);
         return Ok(result);
     }
 }
